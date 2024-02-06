@@ -1,0 +1,11 @@
+
+version: '3.7'
+
+services:
+    app-test:
+        build:
+            context: ..
+            dockerfile: test/unit-test.Dockerfile
+        environment:
+            LISTEN_HOST: 0.0.0.0
+            LISTEN_PORT: 8080
