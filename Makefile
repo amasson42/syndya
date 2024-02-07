@@ -20,6 +20,9 @@ clean:                  ## Clean the build object and stop dependencies
 fclean: clean           ## Reset the state of the package
 	rm -f main
 
+kill:                   ## Stop the program listening on target port
+	sh scripts/kill.sh
+
 test:                   ## Execute the unit tests
 	go test -v ./...
 

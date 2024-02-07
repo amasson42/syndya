@@ -1,0 +1,35 @@
+{
+	"nodes":[
+		{"id":"33b7e6f30ff104d0","type":"group","x":60,"y":-237,"width":1069,"height":471,"label":"K8s Games Cluster"},
+		{"id":"dfa7ce7fd2574616","type":"group","x":-1438,"y":-32,"width":1382,"height":200,"label":"Some players"},
+		{"id":"50067d3430f9a384","type":"text","text":"Game ABC123","x":212,"y":1,"width":250,"height":60},
+		{"id":"9ad6e1c1f5f92485","type":"text","text":"Control Panel","x":422,"y":-260,"width":250,"height":60},
+		{"id":"ae4dd07cda273590","type":"text","text":"Player \"Tim\"\nGame Client","x":-1258,"y":38,"width":160,"height":60},
+		{"id":"765ed1195934fdf3","type":"text","text":"Player \"Joe\"\nGame Client","x":-1134,"y":83,"width":160,"height":60},
+		{"id":"e0dde27a2e7612cc","type":"text","text":"Player \"Mark\"\nGame Client","x":-1109,"y":13,"width":160,"height":60},
+		{"id":"4e9621131ae5be15","type":"text","text":"Player \"Riv\"\nGame Client","x":-836,"y":91,"width":160,"height":60},
+		{"id":"962443b1735869e8","type":"text","text":"...","x":-1377,"y":44,"width":78,"height":60},
+		{"id":"4b736e07d94f0f7e","type":"text","text":"Player \"Seb\"\nGame Client","x":-503,"y":86,"width":160,"height":60},
+		{"id":"2660fca485f30e02","type":"text","text":"Game 123ABC","x":735,"y":-17,"width":250,"height":60},
+		{"id":"2c83914a9120185f","type":"text","text":"Game 1A2B3C","x":491,"y":73,"width":250,"height":60},
+		{"id":"17a93222565c4dd2","type":"text","text":"Player \"Matt\"\nGame Client","x":-819,"y":15,"width":160,"height":60},
+		{"id":"308dacdd004e1b33","type":"text","text":"...","x":-213,"y":51,"width":80,"height":50},
+		{"id":"cf09030fafa4d588","type":"text","text":"Player \"Riv\"\nGame Client","x":-700,"y":71,"width":160,"height":60},
+		{"id":"2536754c7eacb16c","type":"text","text":"Player \"Hugo\"\nGame Client","x":-432,"y":19,"width":160,"height":60},
+		{"id":"4287c5024b85dcda","type":"text","text":"Syndya\nMicroservice","x":-648,"y":-571,"width":160,"height":80}
+	],
+	"edges":[
+		{"id":"60c040b9331e6ebf","fromNode":"9ad6e1c1f5f92485","fromSide":"bottom","toNode":"50067d3430f9a384","toSide":"top"},
+		{"id":"45163db5f9201fa5","fromNode":"9ad6e1c1f5f92485","fromSide":"bottom","toNode":"2c83914a9120185f","toSide":"top"},
+		{"id":"228035a605d16422","fromNode":"9ad6e1c1f5f92485","fromSide":"bottom","toNode":"2660fca485f30e02","toSide":"top"},
+		{"id":"0433a303082d10e0","fromNode":"ae4dd07cda273590","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"9d14648cdcc0bd80","fromNode":"e0dde27a2e7612cc","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"22423bdd16c24826","fromNode":"765ed1195934fdf3","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"f8285eea4c5a41a1","fromNode":"17a93222565c4dd2","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"b4ad07b0fb56ffcb","fromNode":"4e9621131ae5be15","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom","label":"Websocket connection\nSend rating and metadata\nReceive event when game starts"},
+		{"id":"fff9b9f6f9329739","fromNode":"cf09030fafa4d588","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"6a1d25201cba8cbc","fromNode":"2536754c7eacb16c","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"943e83fad5cb0f74","fromNode":"4b736e07d94f0f7e","fromSide":"top","toNode":"4287c5024b85dcda","toSide":"bottom"},
+		{"id":"96634661134e1876","fromNode":"4287c5024b85dcda","fromSide":"right","toNode":"9ad6e1c1f5f92485","toSide":"top","label":"Request to start a game"}
+	]
+}

@@ -8,4 +8,3 @@ MatchMaking microservice that starts multiplayer sessions for a given game
 Build the repository with the command `make build`
 
 Then execute it with `./main`
-

@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"syndya/internal/App"
+	"syndya/internal/syndya"
+)
 
 func main() {
-	fmt.Println("Hello, world !")
+	syndya.Run(App.AppEnv.GetListener())
 }
