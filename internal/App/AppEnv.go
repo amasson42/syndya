@@ -11,10 +11,10 @@ import (
 )
 
 type AppEnvironment struct {
-	LISTEN_HOST string
-	LISTEN_PORT int
+	LISTEN_HOST string `default:"localhost"`
+	LISTEN_PORT int    `default:"8080"`
 
-	/* ... */
+	// Add more environment variables here with default values
 }
 
 var AppEnv AppEnvironment
@@ -24,64 +24,55 @@ func init() {
 }
 
 func loadAppEnvironment() *AppEnvironment {
-	dotenvPosition := *flag.String("env", ".env", "The path of the environment file")
-	fmt.Printf("Load environment from %s\n", dotenvPosition)
-	godotenv.Load(dotenvPosition)
+	envFilePath := *flag.String("env", ".env", "Path to the environment file")
+	fmt.Printf("Loading environment from %s\n", envFilePath)
+	godotenv.Load(envFilePath)
 
-	getenv := func(key string) (string, error) {
-		value := os.Getenv(key)
-		if value == "" {
-			return value, fmt.Errorf("Required value missing for %v", key)
-		}
-		return value, nil
-	}
+	var errors []error
 
-	env := AppEnvironment{}
+	appEnv := AppEnvironment{}
 
-	ts := reflect.TypeOf(env)
-	ps := reflect.ValueOf(&env)
+	structType := reflect.TypeOf(appEnv)
+	structValue := reflect.ValueOf(&appEnv).Elem()
 
-	s := ps.Elem()
+	for i := 0; i < structValue.NumField(); i++ {
 
-	envErrors := []error{}
+		field := structValue.Field(i)
 
-	if s.Kind() == reflect.Struct {
+		fieldName := structType.Field(i).Name
+		defaultValue := structType.Field(i).Tag.Get("default")
 
-		for i := 0; i < s.NumField(); i++ {
-			fname := ts.Field(i).Name
-			f := s.FieldByName(fname)
-			if f.IsValid() {
-				if f.CanSet() {
-					envValue, err := getenv(fname)
-					if err != nil {
-						envErrors = append(envErrors, err)
-					} else if f.Kind() == reflect.String {
-						f.SetString(envValue)
-					} else if f.Kind() == reflect.Int {
-						strValue := envValue
-						intValue, err := strconv.Atoi(strValue)
-						if err != nil {
-							envErrors = append(envErrors, fmt.Errorf("env value(int): %s=%v: %v", fname, strValue, err))
-						} else {
-							f.SetInt(int64(intValue))
-						}
-					} else {
-						envErrors = append(envErrors, fmt.Errorf("Bad env type for app env %v", fname))
-					}
-				}
+		envValue := os.Getenv(fieldName)
+		if envValue == "" {
+			if defaultValue == "" && field.Kind() != reflect.Ptr {
+				errors = append(errors, fmt.Errorf("required value missing for %v", fieldName))
 			}
+			envValue = defaultValue
 		}
 
+		switch field.Kind() {
+		case reflect.String:
+			field.SetString(envValue)
+		case reflect.Int:
+			intValue, err := strconv.Atoi(envValue)
+			if err != nil {
+				errors = append(errors, fmt.Errorf("env value(int): %s=%v: %v", fieldName, envValue, err))
+			} else {
+				field.SetInt(int64(intValue))
+			}
+		default:
+			errors = append(errors, fmt.Errorf("bad env type for app env %v", fieldName))
+		}
 	}
 
-	if len(envErrors) > 0 {
-		for _, err := range envErrors {
+	if len(errors) > 0 {
+		for _, err := range errors {
 			fmt.Println(err)
 		}
-		panic("Incomplete env")
+		panic("Invalid env")
 	}
 
-	return &env
+	return &appEnv
 }
 
 func (appEnv *AppEnvironment) GetListener() string {
