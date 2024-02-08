@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "ce1d87ee3a536ec1",
+        "id": "3e6740367e61056b",
         "type": "tabs",
         "children": [
           {
-            "id": "353efd0b3570b2c4",
+            "id": "5bdcc9cf6ff3ff9c",
             "type": "leaf",
             "state": {
               "type": "kanban",
@@ -16,21 +16,8 @@
                 "file": "TODOS.md"
               }
             }
-          },
-          {
-            "id": "dfc88d426c8518a0",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "API v1.md",
-                "mode": "source",
-                "source": false
-              }
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -96,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "API v1.md",
+                "file": "TODOS.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "API v1.md",
+                "file": "TODOS.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -136,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "API v1.md"
+                "file": "TODOS.md"
               }
             }
           }
@@ -157,12 +144,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "dfc88d426c8518a0",
+  "active": "5bdcc9cf6ff3ff9c",
   "lastOpenFiles": [
-    "TODOS.md",
-    "API v1.md",
-    "Structure-Minimalist.canvas",
     "Structure-Scaling.canvas",
+    "Structure-Minimalist.canvas",
+    "API v1.md",
+    "TODOS.md",
+    "Structure-Minimalist 1.canvas",
     "Home.md"
   ]
 }
