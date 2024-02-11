@@ -5,5 +5,5 @@ import (
 )
 
 func RouteApp(app *App.App) {
-	NewPlayersController().Route(app.Router)
+	NewPlayersController(app.PlayersBank).Route(app.Router)
 }

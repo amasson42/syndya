@@ -1,14 +1,21 @@
 package App
 
-import "github.com/gin-gonic/gin"
+import (
+	"syndya/pkg/Models"
+
+	"github.com/gin-gonic/gin"
+)
 
 type App struct {
-	Router *gin.Engine
+	Router      *gin.Engine
+	PlayersBank Models.SearchingPlayersBank
 }
 
 func MakeApp() *App {
+	playersList := Models.NewSearchingPlayersList()
 	app := App{
-		Router: gin.Default(),
+		Router:      gin.Default(),
+		PlayersBank: playersList,
 	}
 	return &app
 }
