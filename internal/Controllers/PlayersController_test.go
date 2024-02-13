@@ -13,7 +13,7 @@ import (
 
 func makeEngine() (*gin.Engine, Models.SearchingPlayersBank) {
 	playersBank := Models.NewSearchingPlayersList()
-	controller := NewPlayersController(playersBank)
+	controller := NewPlayersController(playersBank, []string{"name", "rating"}, 5000)
 
 	r := gin.Default()
 	controller.Route(r)

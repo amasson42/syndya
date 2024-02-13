@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"syndya/internal/App"
 	"syndya/pkg/Models"
 
 	"github.com/gorilla/websocket"
@@ -83,13 +82,9 @@ func (pc *PlayerConnection) updateMetadata(key string, value string) {
 }
 
 // RequestMissingMetadatas requests missing metadata from the player.
-func (pc *PlayerConnection) RequestMissingMetadatas() bool {
-	if App.AppEnv.METADATAS_LIST == "_" {
-		return true
-	}
-	list := strings.Split(App.AppEnv.METADATAS_LIST, ",")
+func (pc *PlayerConnection) RequestMissingMetadatas(datalist []string) bool {
 	requestedNone := true
-	for _, metaName := range list {
+	for _, metaName := range datalist {
 		if _, keyExists := pc.cachedMetaDatas[metaName]; !keyExists {
 			pc.RequestMetadata(metaName)
 			requestedNone = false

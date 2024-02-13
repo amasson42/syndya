@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -78,4 +79,11 @@ func loadAppEnvironment() *AppEnvironment {
 
 func (appEnv *AppEnvironment) GetListener() string {
 	return fmt.Sprintf("%v:%v", appEnv.LISTEN_HOST, appEnv.LISTEN_PORT)
+}
+
+func (appEnv *AppEnvironment) GetMetadataList() []string {
+	if appEnv.METADATAS_LIST == "_" {
+		return []string{}
+	}
+	return strings.Split(appEnv.METADATAS_LIST, ",")
 }

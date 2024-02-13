@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"syndya/internal/App"
 	"syndya/pkg/Models"
 	"time"
 
@@ -14,21 +13,29 @@ import (
 
 // PlayersController handles WebSocket connections from players.
 type PlayersController struct {
-	upgrader         websocket.Upgrader
-	playersBank      Models.SearchingPlayersBank
-	connections      map[int]*PlayerConnection
-	connectionsMutex sync.Mutex
+	upgrader             websocket.Upgrader
+	playersBank          Models.SearchingPlayersBank
+	connections          map[int]*PlayerConnection
+	connectionsMutex     sync.Mutex
+	metadataList         []string
+	metadataRevivePeriod int
 }
 
 // NewPlayersController creates a new instance of PlayersController.
-func NewPlayersController(playersBank Models.SearchingPlayersBank) *PlayersController {
+func NewPlayersController(
+	playersBank Models.SearchingPlayersBank,
+	metadataList []string,
+	metadataRevivePeriod int,
+) *PlayersController {
 	return &PlayersController{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
 		},
-		playersBank: playersBank,
-		connections: make(map[int]*PlayerConnection),
+		playersBank:          playersBank,
+		connections:          make(map[int]*PlayerConnection),
+		metadataList:         metadataList,
+		metadataRevivePeriod: metadataRevivePeriod,
 	}
 }
 
@@ -54,7 +61,7 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 	defer controller.removeConnection(playerConnection)
 
 	playerConnection.SendPlayerId()
-	playerConnection.RequestMissingMetadatas()
+	playerConnection.RequestMissingMetadatas(controller.metadataList)
 
 	terminateParrallelRoutine := make(chan struct{})
 	defer close(terminateParrallelRoutine)
@@ -80,13 +87,13 @@ func (controller *PlayersController) removeConnection(pc *PlayerConnection) {
 
 // monitorMetadataRequests continuously requests missing metadata for the player.
 func (controller *PlayersController) monitorMetadataRequests(pc *PlayerConnection, terminate <-chan struct{}) {
-	ticker := time.NewTicker(time.Duration(App.AppEnv.METADATAS_REVIVEPERIOD) * time.Millisecond)
+	ticker := time.NewTicker(time.Duration(controller.metadataRevivePeriod) * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			finished := pc.RequestMissingMetadatas()
+			finished := pc.RequestMissingMetadatas(controller.metadataList)
 			if finished {
 				return
 			}
