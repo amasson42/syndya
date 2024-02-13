@@ -2,12 +2,17 @@ package syndya
 
 import (
 	"syndya/internal/App"
+	"syndya/internal/AppEnv"
 )
 
-func Run(listener string) {
+func Run() {
 	app := App.MakeApp()
 	App.RouteApp(app)
-	app.Router.Run(listener)
+
+	app.StartMatchFinder()
+
+	app.Router.Run(AppEnv.AppEnv.GetListener())
+
 	TearDown(app)
 }
 

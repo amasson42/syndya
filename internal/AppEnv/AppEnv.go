@@ -1,4 +1,4 @@
-package App
+package AppEnv
 
 import (
 	"flag"
@@ -16,7 +16,10 @@ type AppEnvironment struct {
 	LISTEN_PORT int    `default:"8080"`
 
 	METADATAS_LIST         string `default:"_"`
-	METADATAS_REVIVEPERIOD int    `default:"5000"`
+	METADATAS_REVIVEPERIOD int    `default:"3000"`
+
+	MATCHFINDER_LUASCRIPT    string `default:"_"`
+	MATCHFINDER_TIMEINTERVAL int    `default:"5000"`
 }
 
 var AppEnv AppEnvironment
@@ -86,4 +89,8 @@ func (appEnv *AppEnvironment) GetMetadataList() []string {
 		return []string{}
 	}
 	return strings.Split(appEnv.METADATAS_LIST, ",")
+}
+
+func (appEnv *AppEnvironment) HasMatchFinderScript() bool {
+	return appEnv.MATCHFINDER_LUASCRIPT != "_"
 }

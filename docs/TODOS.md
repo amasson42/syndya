@@ -11,11 +11,11 @@ kanban-plugin: basic
 
 ## Ongoing
 
+- [ ] Iterate throught all players to create a match
 
 
 ## Pending
 
-- [ ] Iterate throught all players to create a match
 - [ ] Communicate with a kubernetes cluster to start a new game
 
 

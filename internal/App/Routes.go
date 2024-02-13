@@ -1,12 +1,15 @@
 package App
 
-import "syndya/internal/Controllers"
+import (
+	"syndya/internal/AppEnv"
+	"syndya/internal/Controllers"
+)
 
 // RouteApp create all controller and route for the app
 func RouteApp(app *App) {
 	Controllers.NewPlayersController(
 		app.PlayersBank,
-		AppEnv.GetMetadataList(),
-		AppEnv.METADATAS_REVIVEPERIOD,
+		AppEnv.AppEnv.GetMetadataList(),
+		AppEnv.AppEnv.METADATAS_REVIVEPERIOD,
 	).Route(app.Router)
 }
