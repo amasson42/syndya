@@ -20,3 +20,11 @@ This document outlines the endpoints and functionalities provided by the API.
 
 > `GET /players`
 - **Description**: Get the list of all searching players
+
+# Environment Variables
+
+`LISTEN_HOST` (String) Http server listen host
+`LISTEN_PORT` (Integer) Http server listen port
+
+`METADATAS_LIST` (String) Comma separated list of requested metadata for the algorithm to function
+`METADATAS_REVIVEPERIOD` (Integer) Time in milliseconds between each request from the server to fetch missing metadatas

@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"syndya/internal/App"
 	"syndya/pkg/Models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -55,7 +57,10 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 		return nil
 	})
 
+	terminateParrallelRoutine := make(chan struct{})
+
 	defer func() {
+		close(terminateParrallelRoutine)
 		controller.playersBank.DeleteSearchingPlayer(playerId)
 		controller.connectionsMutex.Lock()
 		delete(controller.connections, playerId)
@@ -64,6 +69,24 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 	}()
 
 	playerConnection.SendPlayerId()
+
+	playerConnection.RequestMissingMetadatas()
+
+	requestMetadatasTicker := time.NewTicker(time.Duration(App.AppEnv.METADATAS_REVIVEPERIOD) * time.Millisecond)
+
+	go func() {
+		for {
+			select {
+			case <-requestMetadatasTicker.C:
+				finished := playerConnection.RequestMissingMetadatas()
+				if finished {
+					requestMetadatasTicker.Stop()
+				}
+			case <-terminateParrallelRoutine:
+				return
+			}
+		}
+	}()
 
 	for {
 		_, message, err := conn.ReadMessage()

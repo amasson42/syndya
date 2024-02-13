@@ -14,7 +14,8 @@ type AppEnvironment struct {
 	LISTEN_HOST string `default:"localhost"`
 	LISTEN_PORT int    `default:"8080"`
 
-	// Add more environment variables here with default values
+	METADATAS_LIST         string `default:"_"`
+	METADATAS_REVIVEPERIOD int    `default:"5000"`
 }
 
 var AppEnv AppEnvironment
