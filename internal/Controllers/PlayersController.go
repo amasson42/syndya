@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// PlayersController handles WebSocket connections from players.
 type PlayersController struct {
 	upgrader         websocket.Upgrader
 	playersBank      Models.SearchingPlayersBank
@@ -19,23 +20,25 @@ type PlayersController struct {
 	connectionsMutex sync.Mutex
 }
 
+// NewPlayersController creates a new instance of PlayersController.
 func NewPlayersController(playersBank Models.SearchingPlayersBank) *PlayersController {
-	controller := PlayersController{
+	return &PlayersController{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
 		},
 		playersBank: playersBank,
-		connections: map[int]*PlayerConnection{},
+		connections: make(map[int]*PlayerConnection),
 	}
-	return &controller
 }
 
+// Route routes the endpoints for PlayersController.
 func (controller *PlayersController) Route(router *gin.Engine) {
-	router.GET("search", controller.searchGame)
-	router.GET("players", controller.getPlayers)
+	router.GET("/search", controller.searchGame)
+	router.GET("/players", controller.getPlayers)
 }
 
+// searchGame handles WebSocket connections for searching games.
 func (controller *PlayersController) searchGame(c *gin.Context) {
 	conn, err := controller.upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -45,50 +48,63 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 	}
 
 	playerConnection := NewPlayerConnection(conn, controller.playersBank)
+	defer playerConnection.Close()
 
-	controller.connectionsMutex.Lock()
-	controller.connections[playerConnection.playerId] = playerConnection
-	controller.connectionsMutex.Unlock()
-
-	terminateParrallelRoutine := make(chan struct{})
-
-	defer func() {
-		close(terminateParrallelRoutine)
-		controller.connectionsMutex.Lock()
-		delete(controller.connections, playerConnection.playerId)
-		controller.connectionsMutex.Unlock()
-		playerConnection.Close()
-	}()
+	controller.addConnection(playerConnection)
+	defer controller.removeConnection(playerConnection)
 
 	playerConnection.SendPlayerId()
-
 	playerConnection.RequestMissingMetadatas()
 
-	requestMetadatasTicker := time.NewTicker(time.Duration(App.AppEnv.METADATAS_REVIVEPERIOD) * time.Millisecond)
+	terminateParrallelRoutine := make(chan struct{})
+	defer close(terminateParrallelRoutine)
 
-	go func() {
-		for {
-			select {
-			case <-requestMetadatasTicker.C:
-				finished := playerConnection.RequestMissingMetadatas()
-				if finished {
-					requestMetadatasTicker.Stop()
-				}
-			case <-terminateParrallelRoutine:
-				return
-			}
-		}
-	}()
+	go controller.monitorMetadataRequests(playerConnection, terminateParrallelRoutine)
+
+	controller.readMessages(playerConnection)
+}
+
+// addConnection adds a player connection to the controller's connections map.
+func (controller *PlayersController) addConnection(pc *PlayerConnection) {
+	controller.connectionsMutex.Lock()
+	defer controller.connectionsMutex.Unlock()
+	controller.connections[pc.playerId] = pc
+}
+
+// removeConnection removes a player connection from the controller's connections map.
+func (controller *PlayersController) removeConnection(pc *PlayerConnection) {
+	controller.connectionsMutex.Lock()
+	defer controller.connectionsMutex.Unlock()
+	delete(controller.connections, pc.playerId)
+}
+
+// monitorMetadataRequests continuously requests missing metadata for the player.
+func (controller *PlayersController) monitorMetadataRequests(pc *PlayerConnection, terminate <-chan struct{}) {
+	ticker := time.NewTicker(time.Duration(App.AppEnv.METADATAS_REVIVEPERIOD) * time.Millisecond)
+	defer ticker.Stop()
 
 	for {
-		_, message, err := conn.ReadMessage()
+		select {
+		case <-ticker.C:
+			finished := pc.RequestMissingMetadatas()
+			if finished {
+				return
+			}
+		case <-terminate:
+			return
+		}
+	}
+}
 
+// readMessages reads messages from the player connection and interprets them.
+func (controller *PlayersController) readMessages(pc *PlayerConnection) {
+	for {
+		_, message, err := pc.conn.ReadMessage()
 		if err != nil {
 			log.Println("Error reading message: ", err)
 			break
 		}
-
-		playerConnection.InterpretWebSocketMessage(string(message))
+		pc.InterpretWebSocketMessage(string(message))
 	}
 }
 

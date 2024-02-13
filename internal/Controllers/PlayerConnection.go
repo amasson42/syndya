@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// PlayerConnection represents a connection with a player.
 type PlayerConnection struct {
 	playerId        int
 	conn            *websocket.Conn
@@ -17,6 +18,7 @@ type PlayerConnection struct {
 	cachedMetaDatas map[string]string
 }
 
+// NewPlayerConnection creates a new PlayerConnection instance.
 func NewPlayerConnection(conn *websocket.Conn, playersBank Models.SearchingPlayersBank) *PlayerConnection {
 	playerId := playersBank.CreateSearchingPlayer()
 
@@ -29,64 +31,84 @@ func NewPlayerConnection(conn *websocket.Conn, playersBank Models.SearchingPlaye
 		playerId:        playerId,
 		conn:            conn,
 		playersBank:     playersBank,
-		cachedMetaDatas: map[string]string{},
+		cachedMetaDatas: make(map[string]string),
 	}
 }
 
-func (playerConnection *PlayerConnection) Close() {
-	playerConnection.conn.Close()
-	playerConnection.playersBank.DeleteSearchingPlayer(playerConnection.playerId)
+// Close closes the connection and removes the player from the players bank.
+func (pc *PlayerConnection) Close() {
+	pc.conn.Close()
+	pc.playersBank.DeleteSearchingPlayer(pc.playerId)
 }
 
-func (playerConnection *PlayerConnection) SendPlayerId() {
-	playerConnection.sendMessage(fmt.Sprintf("id %v", playerConnection.playerId))
+// SendPlayerId sends the player's ID over the connection.
+func (pc *PlayerConnection) SendPlayerId() {
+	pc.sendMessage(fmt.Sprintf("id %v", pc.playerId))
 }
 
-func (playerConnection *PlayerConnection) InterpretWebSocketMessage(message string) {
+// InterpretWebSocketMessage interprets a message received over the WebSocket connection.
+func (pc *PlayerConnection) InterpretWebSocketMessage(message string) {
 	cmd := strings.SplitN(string(message[:]), " ", 2)
 
-	if len(cmd) >= 1 {
-		switch cmd[0] {
-		case "meta":
-			if len(cmd) >= 2 {
-				parameters := strings.SplitN(cmd[1], "=", 2)
-				if len(parameters) == 2 {
-					metaKey := parameters[0]
-					metaValue := parameters[1]
-					playerConnection.playersBank.UpdateSearchingPlayerMetadata(playerConnection.playerId, metaKey, metaValue)
-					playerConnection.cachedMetaDatas[metaKey] = metaValue
-				}
-			}
-		case "id":
-			playerConnection.SendPlayerId()
-		}
+	if len(cmd) < 1 {
+		return
+	}
+
+	switch cmd[0] {
+	case "meta":
+		pc.handleMetadataCommand(cmd)
+	case "id":
+		pc.SendPlayerId()
 	}
 }
 
-func (playerConnection *PlayerConnection) RequestMissingMetadatas() bool {
+// handleMetadataCommand handles the "meta" command received over WebSocket.
+func (pc *PlayerConnection) handleMetadataCommand(cmd []string) {
+	if len(cmd) < 2 {
+		return
+	}
+
+	parameters := strings.SplitN(cmd[1], "=", 2)
+	if len(parameters) != 2 {
+		return
+	}
+
+	pc.updateMetadata(parameters[0], parameters[1])
+}
+
+// updateMetadata updates the metadata for the player.
+func (pc *PlayerConnection) updateMetadata(key string, value string) {
+	pc.playersBank.UpdateSearchingPlayerMetadata(pc.playerId, key, value)
+	pc.cachedMetaDatas[key] = value
+}
+
+// RequestMissingMetadatas requests missing metadata from the player.
+func (pc *PlayerConnection) RequestMissingMetadatas() bool {
 	if App.AppEnv.METADATAS_LIST == "_" {
 		return true
 	}
 	list := strings.Split(App.AppEnv.METADATAS_LIST, ",")
 	requestedNone := true
 	for _, metaName := range list {
-		if _, isMapContainsKey := playerConnection.cachedMetaDatas[metaName]; !isMapContainsKey {
-			playerConnection.RequestMetadata(metaName)
+		if _, keyExists := pc.cachedMetaDatas[metaName]; !keyExists {
+			pc.RequestMetadata(metaName)
 			requestedNone = false
 		}
 	}
 	return requestedNone
 }
 
-func (playerConnection *PlayerConnection) RequestMetadata(key string) {
-	playerConnection.sendMessage(fmt.Sprintf("meta %v", key))
+// RequestMetadata requests a specific metadata from the player.
+func (pc *PlayerConnection) RequestMetadata(key string) {
+	pc.sendMessage(fmt.Sprintf("meta %v", key))
 }
 
-func (playerConnection *PlayerConnection) sendMessage(message string) {
-	if playerConnection.conn == nil {
+// sendMessage sends a message over the WebSocket connection.
+func (pc *PlayerConnection) sendMessage(message string) {
+	if pc.conn == nil {
 		return
 	}
-	err := playerConnection.conn.WriteMessage(websocket.TextMessage, []byte(message))
+	err := pc.conn.WriteMessage(websocket.TextMessage, []byte(message))
 	if err != nil {
 		log.Println("Error writing message: ", err)
 		return
