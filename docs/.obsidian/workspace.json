@@ -4,17 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "3e6740367e61056b",
+        "id": "70ff124d7e763976",
         "type": "tabs",
         "children": [
           {
-            "id": "5bdcc9cf6ff3ff9c",
+            "id": "1ae3e195eb56344a",
             "type": "leaf",
             "state": {
-              "type": "kanban",
-              "state": {
-                "file": "TODOS.md"
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -83,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "TODOS.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "TODOS.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -122,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "TODOS.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -144,12 +138,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5bdcc9cf6ff3ff9c",
+  "active": "1ae3e195eb56344a",
   "lastOpenFiles": [
+    "TODOS.md",
     "Structure-Scaling.canvas",
     "Structure-Minimalist.canvas",
     "API v1.md",
-    "TODOS.md",
     "Structure-Minimalist 1.canvas",
     "Home.md"
   ]
