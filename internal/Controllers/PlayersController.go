@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 	"syndya/pkg/Models"
 
@@ -15,7 +14,7 @@ import (
 type PlayersController struct {
 	upgrader         websocket.Upgrader
 	playersBank      Models.SearchingPlayersBank
-	connections      map[int]*websocket.Conn
+	connections      map[int]*PlayerConnection
 	connectionsMutex sync.Mutex
 }
 
@@ -26,7 +25,7 @@ func NewPlayersController(playersBank Models.SearchingPlayersBank) *PlayersContr
 			WriteBufferSize: 1024,
 		},
 		playersBank: playersBank,
-		connections: map[int]*websocket.Conn{},
+		connections: map[int]*PlayerConnection{},
 	}
 	return &controller
 }
@@ -45,9 +44,10 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 	}
 
 	playerId := controller.playersBank.CreateSearchingPlayer()
+	playerConnection := NewPlayerConnection(playerId, conn, controller.playersBank)
 
 	controller.connectionsMutex.Lock()
-	controller.connections[playerId] = conn
+	controller.connections[playerId] = playerConnection
 	controller.connectionsMutex.Unlock()
 
 	conn.SetCloseHandler(func(code int, text string) error {
@@ -63,7 +63,7 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 		conn.Close()
 	}()
 
-	controller.sendPlayerId(playerId)
+	playerConnection.SendPlayerId()
 
 	for {
 		_, message, err := conn.ReadMessage()
@@ -73,42 +73,8 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 			break
 		}
 
-		controller.interpretWebSocketMessage(string(message), playerId)
+		playerConnection.InterpretWebSocketMessage(string(message))
 
-	}
-}
-
-func (controller *PlayersController) interpretWebSocketMessage(message string, playerId int) {
-	cmd := strings.SplitN(string(message[:]), " ", 2)
-
-	if len(cmd) >= 1 {
-		switch cmd[0] {
-		case "meta":
-			if len(cmd) >= 2 {
-				parameters := strings.SplitN(cmd[1], "=", 2)
-				if len(parameters) == 2 {
-					metaKey := parameters[0]
-					metaValue := parameters[1]
-					controller.playersBank.UpdateSearchingPlayerMetadata(playerId, metaKey, metaValue)
-				}
-			}
-		case "id":
-			controller.sendPlayerId(playerId)
-		}
-	}
-}
-
-func (controller *PlayersController) sendPlayerId(playerId int) {
-	controller.connectionsMutex.Lock()
-	conn := controller.connections[playerId]
-	controller.connectionsMutex.Unlock()
-	if conn == nil {
-		return
-	}
-	err := conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("id %v", playerId)))
-	if err != nil {
-		log.Println("Error writing message: ", err)
-		return
 	}
 }
 
