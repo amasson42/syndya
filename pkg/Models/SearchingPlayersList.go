@@ -39,7 +39,7 @@ func (playersBank *SearchingPlayersList) GetSearchingPlayerFromID(id int) *Searc
 	return nil
 }
 
-func (playersBank *SearchingPlayersList) UpdateSearchingPlayerMetadata(id int, key string, value interface{}) bool {
+func (playersBank *SearchingPlayersList) UpdateSearchingPlayerMetadata(id int, key string, value string) bool {
 	if _, exists := playersBank.players[id]; exists {
 		playersBank.players[id].MetaData[key] = value
 		return true
