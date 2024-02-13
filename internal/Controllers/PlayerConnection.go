@@ -17,7 +17,14 @@ type PlayerConnection struct {
 	cachedMetaDatas map[string]string
 }
 
-func NewPlayerConnection(playerId int, conn *websocket.Conn, playersBank Models.SearchingPlayersBank) *PlayerConnection {
+func NewPlayerConnection(conn *websocket.Conn, playersBank Models.SearchingPlayersBank) *PlayerConnection {
+	playerId := playersBank.CreateSearchingPlayer()
+
+	conn.SetCloseHandler(func(code int, text string) error {
+		fmt.Printf("Closed connection with %v", playerId)
+		return nil
+	})
+
 	return &PlayerConnection{
 		playerId:        playerId,
 		conn:            conn,
@@ -26,15 +33,13 @@ func NewPlayerConnection(playerId int, conn *websocket.Conn, playersBank Models.
 	}
 }
 
+func (playerConnection *PlayerConnection) Close() {
+	playerConnection.conn.Close()
+	playerConnection.playersBank.DeleteSearchingPlayer(playerConnection.playerId)
+}
+
 func (playerConnection *PlayerConnection) SendPlayerId() {
-	if playerConnection.conn == nil {
-		return
-	}
-	err := playerConnection.conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("id %v", playerConnection.playerId)))
-	if err != nil {
-		log.Println("Error writing message: ", err)
-		return
-	}
+	playerConnection.sendMessage(fmt.Sprintf("id %v", playerConnection.playerId))
 }
 
 func (playerConnection *PlayerConnection) InterpretWebSocketMessage(message string) {
@@ -74,7 +79,14 @@ func (playerConnection *PlayerConnection) RequestMissingMetadatas() bool {
 }
 
 func (playerConnection *PlayerConnection) RequestMetadata(key string) {
-	err := playerConnection.conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("meta %v", key)))
+	playerConnection.sendMessage(fmt.Sprintf("meta %v", key))
+}
+
+func (playerConnection *PlayerConnection) sendMessage(message string) {
+	if playerConnection.conn == nil {
+		return
+	}
+	err := playerConnection.conn.WriteMessage(websocket.TextMessage, []byte(message))
 	if err != nil {
 		log.Println("Error writing message: ", err)
 		return

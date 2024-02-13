@@ -1,7 +1,6 @@
 package Controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -45,27 +44,20 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 		return
 	}
 
-	playerId := controller.playersBank.CreateSearchingPlayer()
-	playerConnection := NewPlayerConnection(playerId, conn, controller.playersBank)
+	playerConnection := NewPlayerConnection(conn, controller.playersBank)
 
 	controller.connectionsMutex.Lock()
-	controller.connections[playerId] = playerConnection
+	controller.connections[playerConnection.playerId] = playerConnection
 	controller.connectionsMutex.Unlock()
-
-	conn.SetCloseHandler(func(code int, text string) error {
-		fmt.Printf("Closed connection with %v", playerId)
-		return nil
-	})
 
 	terminateParrallelRoutine := make(chan struct{})
 
 	defer func() {
 		close(terminateParrallelRoutine)
-		controller.playersBank.DeleteSearchingPlayer(playerId)
 		controller.connectionsMutex.Lock()
-		delete(controller.connections, playerId)
+		delete(controller.connections, playerConnection.playerId)
 		controller.connectionsMutex.Unlock()
-		conn.Close()
+		playerConnection.Close()
 	}()
 
 	playerConnection.SendPlayerId()
@@ -97,7 +89,6 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 		}
 
 		playerConnection.InterpretWebSocketMessage(string(message))
-
 	}
 }
 
