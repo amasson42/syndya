@@ -5,6 +5,7 @@ type SearchingPlayersBank interface {
 	GetSearchingPlayerFromID(id int) *SearchingPlayer
 	GetAllSearchingPlayers() []SearchingPlayer
 	UpdateSearchingPlayerMetadata(id int, key string, value string) bool
+	SetSearchingPlayerComplete(id int, complete bool) bool
 	DeleteSearchingPlayer(id int) bool
-	ForEach(func(*SearchingPlayer))
+	ForEach(f func(*SearchingPlayer), ignoreIncompletes bool)
 }

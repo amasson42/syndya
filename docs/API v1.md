@@ -27,6 +27,7 @@ This document outlines the endpoints and functionalities provided by the API.
 `LISTEN_PORT` (Integer) Http server listen port
 
 `METADATAS_LIST` (String) Comma separated list of requested metadata for the algorithm to function
+`METADATAS_REQUIRED` (Bool) Option to ignore players with missing metadatas when processing matchmakings
 `METADATAS_REVIVEPERIOD` (Integer) Time in milliseconds between each request from the server to fetch missing metadatas
 
 `MATCHFINDER_LUASCRIPT` (String) Path to the lua script file that manage matchmaking (details at [[Matchmaking script]]). If none is given, this service won't run.

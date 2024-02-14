@@ -1,6 +1,8 @@
 package Models
 
-import "sync"
+import (
+	"sync"
+)
 
 // SearchingPlayersList manages a list of searching players.
 type SearchingPlayersList struct {
@@ -66,6 +68,17 @@ func (pb *SearchingPlayersList) UpdateSearchingPlayerMetadata(id int, key, value
 	return false
 }
 
+func (pb *SearchingPlayersList) SetSearchingPlayerComplete(id int, complete bool) bool {
+	pb.contentMutex.Lock()
+	defer pb.contentMutex.Unlock()
+	if player, exists := pb.players[id]; exists {
+		player.Complete = complete
+		pb.players[id] = player
+		return true
+	}
+	return false
+}
+
 // DeleteSearchingPlayer deletes a searching player with the given ID.
 func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 	pb.contentMutex.Lock()
@@ -78,11 +91,14 @@ func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 	return false
 }
 
-func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer)) {
+// Safely iterate throught all searching players and execute the closure
+func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer), ignoreIncompletes bool) {
 	pb.contentMutex.Lock()
 	defer pb.contentMutex.Unlock()
 
 	for _, v := range pb.players {
-		f(&v)
+		if v.Complete || !ignoreIncompletes {
+			f(&v)
+		}
 	}
 }

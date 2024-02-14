@@ -30,6 +30,7 @@ func (app *App) MatchFinderService() {
 	}
 	matchfinder, err := MatchFinder.NewMatchFinder(
 		app.PlayersBank,
+		AppEnv.AppEnv.METADATAS_REQUIRED,
 		AppEnv.AppEnv.MATCHFINDER_LUASCRIPT,
 		AppEnv.AppEnv.MATCHFINDER_RESETSTATE,
 	)

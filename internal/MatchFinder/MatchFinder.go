@@ -12,23 +12,26 @@ import (
 type MatchupFunction func(ids []int)
 
 type MatchFinder struct {
-	playersBank     Models.SearchingPlayersBank
-	scriptPath      string
-	luaState        *lua.LState
-	resetEachLoop   bool
-	MatchupDelegate MatchupFunction
+	playersBank       Models.SearchingPlayersBank
+	ignoreIncompletes bool
+	scriptPath        string
+	luaState          *lua.LState
+	resetEachLoop     bool
+	MatchupDelegate   MatchupFunction
 }
 
 func NewMatchFinder(
 	playersBank Models.SearchingPlayersBank,
+	ignoreIncompletes bool,
 	scriptPath string,
 	resetEachLoop bool,
 ) (*MatchFinder, error) {
 	mf := &MatchFinder{
-		playersBank:   playersBank,
-		scriptPath:    scriptPath,
-		luaState:      nil,
-		resetEachLoop: resetEachLoop,
+		playersBank:       playersBank,
+		ignoreIncompletes: ignoreIncompletes,
+		scriptPath:        scriptPath,
+		luaState:          nil,
+		resetEachLoop:     resetEachLoop,
 	}
 
 	err := mf.reloadScript()
@@ -80,7 +83,7 @@ func (mf *MatchFinder) RunOnce() {
 			log.Printf("[LUA]: %v\n", err)
 		}
 
-	})
+	}, mf.ignoreIncompletes)
 
 	if err := L.CallByParam(lua.P{
 		Fn:      L.GetGlobal("finish"),

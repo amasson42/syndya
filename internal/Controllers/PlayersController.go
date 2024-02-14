@@ -95,6 +95,7 @@ func (controller *PlayersController) monitorMetadataRequests(pc *PlayerConnectio
 		case <-ticker.C:
 			finished := pc.RequestMissingMetadatas(controller.metadataList)
 			if finished {
+				controller.playersBank.SetSearchingPlayerComplete(pc.playerId, true)
 				return
 			}
 		case <-terminate:

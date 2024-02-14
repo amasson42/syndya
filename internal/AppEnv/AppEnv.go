@@ -16,6 +16,7 @@ type AppEnvironment struct {
 	LISTEN_PORT int    `default:"8080"`
 
 	METADATAS_LIST         string `default:"_"`
+	METADATAS_REQUIRED     bool   `default:"true"`
 	METADATAS_REVIVEPERIOD int    `default:"3000"`
 
 	MATCHFINDER_LUASCRIPT    string `default:"_"`
