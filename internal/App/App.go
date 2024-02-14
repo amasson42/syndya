@@ -42,7 +42,10 @@ func (app *App) MatchFinderService() {
 	app.MatchFinder = matchfinder
 
 	matchfinder.MatchupDelegate = func(ids []int) {
-		log.Printf("We have a MATCH ! %v\n", ids)
+		// TODO: start a game and make players join
+		for i := 0; i < len(ids); i++ {
+			app.PlayersBank.SetSearchingPlayerGameAddr(ids[i], "unimplemented-game-deployement")
+		}
 	}
 
 	matchfinder.AsyncRunLoop(AppEnv.AppEnv.MATCHFINDER_TIMEINTERVAL)

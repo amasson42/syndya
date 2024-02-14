@@ -20,6 +20,7 @@ type MatchFinder struct {
 	luaState          *lua.LState
 	resetEachLoop     bool
 	MatchupDelegate   MatchupFunction
+	pendingMatchups   [][]int
 }
 
 // NewMatchFinder creates a new MatchFinder instance.
@@ -35,6 +36,7 @@ func NewMatchFinder(
 		scriptPath:        scriptPath,
 		luaState:          nil,
 		resetEachLoop:     resetEachLoop,
+		pendingMatchups:   [][]int{},
 	}
 
 	err := mf.reloadScript()
@@ -95,6 +97,13 @@ func (mf *MatchFinder) RunOnce() {
 	}); err != nil {
 		log.Printf("[LUA]: %v\n", err)
 	}
+
+	for i := 0; i < len(mf.pendingMatchups); i++ {
+		ids := mf.pendingMatchups[i]
+		mf.MatchupDelegate(ids)
+	}
+	mf.pendingMatchups = [][]int{}
+
 }
 
 // reloadScript reloads the Lua script.
@@ -158,7 +167,7 @@ func (mf *MatchFinder) reloadScript() error {
 				}
 			})
 			if mf.MatchupDelegate != nil {
-				mf.MatchupDelegate(playersIds)
+				mf.pendingMatchups = append(mf.pendingMatchups, playersIds)
 			}
 		} else {
 			log.Printf("Nope %v\n", L.Get(1).Type())

@@ -7,6 +7,7 @@ type SearchingPlayer struct {
 	TimeStamp int64             `json:"timestamp"`
 	MetaData  map[string]string `json:"metadata"`
 	Complete  bool              `json:"complete"`
+	GameAddr  *string           `json:"gameaddr"`
 }
 
 func NewSearchingPlayer(id int) SearchingPlayer {
@@ -15,5 +16,6 @@ func NewSearchingPlayer(id int) SearchingPlayer {
 		TimeStamp: time.Now().Unix(),
 		MetaData:  map[string]string{},
 		Complete:  false,
+		GameAddr:  nil,
 	}
 }

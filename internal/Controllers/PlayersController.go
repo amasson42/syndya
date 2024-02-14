@@ -68,6 +68,8 @@ func (controller *PlayersController) searchGame(c *gin.Context) {
 
 	go controller.monitorMetadataRequests(playerConnection, terminateParrallelRoutine)
 
+	go controller.monitorPlayerGameFound(playerConnection, terminateParrallelRoutine)
+
 	controller.readMessages(playerConnection)
 }
 
@@ -96,6 +98,25 @@ func (controller *PlayersController) monitorMetadataRequests(pc *PlayerConnectio
 			finished := pc.RequestMissingMetadatas(controller.metadataList)
 			if finished {
 				controller.playersBank.SetSearchingPlayerComplete(pc.playerId, true)
+				return
+			}
+		case <-terminate:
+			return
+		}
+	}
+}
+
+// monitorPlayerGameFound continuously check if the player has found a match.
+func (controller *PlayersController) monitorPlayerGameFound(pc *PlayerConnection, terminate <-chan struct{}) {
+	ticker := time.NewTicker(time.Duration(3000) * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			player := controller.playersBank.GetSearchingPlayerFromID(pc.playerId)
+			if player != nil && player.GameAddr != nil {
+				pc.SendGameAddr(*player.GameAddr)
 				return
 			}
 		case <-terminate:

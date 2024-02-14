@@ -22,7 +22,7 @@ func NewPlayerConnection(conn *websocket.Conn, playersBank Models.SearchingPlaye
 	playerId := playersBank.CreateSearchingPlayer()
 
 	conn.SetCloseHandler(func(code int, text string) error {
-		fmt.Printf("Closed connection with %v", playerId)
+		log.Printf("Closed connection with %v\n", playerId)
 		return nil
 	})
 
@@ -96,6 +96,11 @@ func (pc *PlayerConnection) RequestMissingMetadatas(datalist []string) bool {
 // RequestMetadata requests a specific metadata from the player.
 func (pc *PlayerConnection) RequestMetadata(key string) {
 	pc.sendMessage(fmt.Sprintf("meta %v", key))
+}
+
+// SendGameAddr send the game address to the player.
+func (pc *PlayerConnection) SendGameAddr(addr string) {
+	pc.sendMessage(fmt.Sprintf("game %v", addr))
 }
 
 // sendMessage sends a message over the WebSocket connection.

@@ -79,6 +79,17 @@ func (pb *SearchingPlayersList) SetSearchingPlayerComplete(id int, complete bool
 	return false
 }
 
+func (pb *SearchingPlayersList) SetSearchingPlayerGameAddr(id int, addr string) bool {
+	pb.contentMutex.Lock()
+	defer pb.contentMutex.Unlock()
+	if player, exists := pb.players[id]; exists {
+		player.GameAddr = &addr
+		pb.players[id] = player
+		return true
+	}
+	return false
+}
+
 // DeleteSearchingPlayer deletes a searching player with the given ID.
 func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 	pb.contentMutex.Lock()
@@ -97,7 +108,7 @@ func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer), ignoreIncomple
 	defer pb.contentMutex.Unlock()
 
 	for _, v := range pb.players {
-		if v.Complete || !ignoreIncompletes {
+		if (v.Complete || !ignoreIncompletes) && v.GameAddr == nil {
 			f(&v)
 		}
 	}

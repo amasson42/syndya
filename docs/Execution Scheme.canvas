@@ -1,0 +1,42 @@
+{
+	"nodes":[
+		{"id":"fdb564f4bb9c95e9","type":"text","text":"Main Thread","x":-466,"y":-311,"width":171,"height":75},
+		{"id":"363dfec6781d346c","type":"text","text":"syndya run","x":-504,"y":-143,"width":250,"height":60},
+		{"id":"06e4e10cb50d324c","type":"text","text":"Make App\n- App\n\t- Gin Engine\n\t- Player Bank\n-  Routing App\n\t- Controllers","x":-505,"y":0,"width":253,"height":243},
+		{"id":"240bec5669c119ab","type":"text","text":"App Running\n* Listening on port","x":-505,"y":337,"width":250,"height":107,"color":"5"},
+		{"id":"8b580fc47946dbff","x":-516,"y":660,"width":250,"height":60,"color":"5","type":"text","text":""},
+		{"id":"894a89b44d10cbe5","x":-723,"y":628,"width":296,"height":71,"color":"5","type":"text","text":"**Upgrade to Websocket**"},
+		{"id":"f5b11bc1a8704f12","type":"text","text":"**Async Run Loop**","x":8,"y":371,"width":250,"height":60,"color":"5"},
+		{"id":"292c757505bc108f","type":"text","text":"**Match Finder Service**\n* Make MatchFinder","x":-15,"y":52,"width":292,"height":134},
+		{"id":"c4796e55c3b58301","x":-955,"y":401,"width":264,"height":121,"type":"text","text":"**PlayersController**\n* List of connections"},
+		{"id":"d61b05a27e9cbd43","x":-878,"y":858,"width":276,"height":68,"type":"text","text":"**Make PlayerConnection**"},
+		{"id":"4d3ef3eecefc41a9","x":-1443,"y":571,"width":241,"height":98,"color":"2","type":"text","text":"**PlayersBank**\nExternal Database"},
+		{"id":"7a6e2cce2f51898b","x":-864,"y":1120,"width":285,"height":66,"color":"5","type":"text","text":"monitorPlayerGameFound"},
+		{"id":"ae7eeec4b4358fc3","x":-1180,"y":1120,"width":277,"height":63,"color":"5","type":"text","text":"monitorMetadataRequest"},
+		{"id":"49350c645c79dbf9","x":-531,"y":1124,"width":250,"height":60,"color":"5","type":"text","text":"read socket messages"},
+		{"id":"1fcb5cdad2dff4c7","x":-1311,"y":1297,"width":376,"height":267,"type":"text","text":"*Every tick of time*\n* Check missing metadatas\n* Send message to websocket for each missing metadatas\n* If no metadatas is required, end this thread"},
+		{"id":"5af142f5119798b4","x":-69,"y":533,"width":394,"height":202,"type":"text","text":"*Every tick of time*\n* iterate through all players\n\t* execute the custom lua script to find matchups"},
+		{"id":"bf0cc6afb7fb561c","x":-89,"y":865,"width":437,"height":144,"type":"text","text":"* For each matchups\n\t* Use MatchFinder delegate function to broadcast matchup"},
+		{"id":"bd7942cd9a8c82a2","x":-871,"y":1303,"width":293,"height":235,"type":"text","text":"*Every tick of time*\n* Check if the player has a game\n* If there is one, end this thread"},
+		{"id":"b231b42ba0452660","x":-476,"y":1301,"width":321,"height":163,"type":"text","text":"*When receiving socket message*\n* Interpret the message"}
+	],
+	"edges":[
+		{"id":"d87bd6f8e9d2eb3e","fromNode":"fdb564f4bb9c95e9","fromSide":"bottom","toNode":"363dfec6781d346c","toSide":"top"},
+		{"id":"bc5376677b8b3e23","fromNode":"363dfec6781d346c","fromSide":"bottom","toNode":"06e4e10cb50d324c","toSide":"top"},
+		{"id":"27fea324d16a1c53","fromNode":"06e4e10cb50d324c","fromSide":"bottom","toNode":"240bec5669c119ab","toSide":"top"},
+		{"id":"8b1de30af1582715","fromNode":"06e4e10cb50d324c","fromSide":"right","toNode":"292c757505bc108f","toSide":"left"},
+		{"id":"75a8b5fd1496ae46","fromNode":"292c757505bc108f","fromSide":"bottom","toNode":"f5b11bc1a8704f12","toSide":"top","label":"If MATCHFINDER_LUASCRIPT"},
+		{"id":"50b9dcd224ee25c6","fromNode":"240bec5669c119ab","fromSide":"bottom","toNode":"894a89b44d10cbe5","toSide":"top","label":"/search"},
+		{"id":"7fcae2513655230c","fromNode":"894a89b44d10cbe5","fromSide":"bottom","toNode":"d61b05a27e9cbd43","toSide":"top"},
+		{"id":"8c2e26d0522ccf40","fromNode":"06e4e10cb50d324c","fromSide":"left","toNode":"c4796e55c3b58301","toSide":"top"},
+		{"id":"fbc397a962cd85fa","fromNode":"d61b05a27e9cbd43","fromSide":"left","toNode":"c4796e55c3b58301","toSide":"bottom","label":"Add connection to controller"},
+		{"id":"67b0f1f134e5426a","fromNode":"d61b05a27e9cbd43","fromSide":"bottom","toNode":"ae7eeec4b4358fc3","toSide":"top"},
+		{"id":"884751aa237a72e3","fromNode":"d61b05a27e9cbd43","fromSide":"bottom","toNode":"7a6e2cce2f51898b","toSide":"top"},
+		{"id":"7ca27cf963dadb71","fromNode":"d61b05a27e9cbd43","fromSide":"bottom","toNode":"49350c645c79dbf9","toSide":"top"},
+		{"id":"55c46c48f72b0267","fromNode":"f5b11bc1a8704f12","fromSide":"bottom","toNode":"5af142f5119798b4","toSide":"top"},
+		{"id":"45993cf119f4148d","fromNode":"5af142f5119798b4","fromSide":"bottom","toNode":"bf0cc6afb7fb561c","toSide":"top"},
+		{"id":"b36160b99150e06a","fromNode":"ae7eeec4b4358fc3","fromSide":"bottom","toNode":"1fcb5cdad2dff4c7","toSide":"top"},
+		{"id":"c6e71a047e0900aa","fromNode":"7a6e2cce2f51898b","fromSide":"bottom","toNode":"bd7942cd9a8c82a2","toSide":"top"},
+		{"id":"0265d6aed8c20aae","fromNode":"49350c645c79dbf9","fromSide":"bottom","toNode":"b231b42ba0452660","toSide":"top"}
+	]
+}
