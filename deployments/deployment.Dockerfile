@@ -56,5 +56,7 @@ USER syndya:syndya
 # Let Docker bind to port 8080
 EXPOSE 8080
 
+ENV MATCHFINDER_LUASCRIPT=assets/matchup.lua
+
 # Start the service when the image is run, default to listening on 8080 in production environment
 ENTRYPOINT ["./main"]

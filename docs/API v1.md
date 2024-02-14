@@ -31,4 +31,4 @@ This document outlines the endpoints and functionalities provided by the API.
 
 `MATCHFINDER_LUASCRIPT` (String) Path to the lua script file that manage matchmaking (details at [[Matchmaking script]]). If none is given, this service won't run.
 `MATCHFINDER_TIMEINTERVAL` (Integer) Time in milliseconds between each call to the custom script with all searching players
-
+`MATCHFINDER_RESETSTATE` (Bool) Fully destroy and re create the lua state between each matchmaking loops

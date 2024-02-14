@@ -6,4 +6,5 @@ type SearchingPlayersBank interface {
 	GetAllSearchingPlayers() []SearchingPlayer
 	UpdateSearchingPlayerMetadata(id int, key string, value string) bool
 	DeleteSearchingPlayer(id int) bool
+	ForEach(func(*SearchingPlayer))
 }

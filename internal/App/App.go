@@ -1,6 +1,7 @@
 package App
 
 import (
+	"log"
 	"syndya/internal/AppEnv"
 	"syndya/internal/MatchFinder"
 	"syndya/pkg/Models"
@@ -11,6 +12,7 @@ import (
 type App struct {
 	Router      *gin.Engine
 	PlayersBank Models.SearchingPlayersBank
+	MatchFinder *MatchFinder.MatchFinder
 }
 
 func MakeApp() *App {
@@ -22,13 +24,25 @@ func MakeApp() *App {
 	return &app
 }
 
-func (app *App) StartMatchFinder() {
+func (app *App) MatchFinderService() {
 	if !AppEnv.AppEnv.HasMatchFinderScript() {
 		return
 	}
-	matchfinder := MatchFinder.NewMatchFinder(
+	matchfinder, err := MatchFinder.NewMatchFinder(
 		app.PlayersBank,
 		AppEnv.AppEnv.MATCHFINDER_LUASCRIPT,
+		AppEnv.AppEnv.MATCHFINDER_RESETSTATE,
 	)
+	if err != nil {
+		log.Println("Error loading matchfinder script: ", err)
+		return
+	}
+
+	app.MatchFinder = matchfinder
+
+	matchfinder.MatchupDelegate = func(ids []int) {
+		log.Printf("We have a MATCH ! %v\n", ids)
+	}
+
 	matchfinder.AsyncRunLoop(AppEnv.AppEnv.MATCHFINDER_TIMEINTERVAL)
 }

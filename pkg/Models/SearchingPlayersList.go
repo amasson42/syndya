@@ -77,3 +77,12 @@ func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 	}
 	return false
 }
+
+func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer)) {
+	pb.contentMutex.Lock()
+	defer pb.contentMutex.Unlock()
+
+	for _, v := range pb.players {
+		f(&v)
+	}
+}

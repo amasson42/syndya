@@ -20,6 +20,7 @@ type AppEnvironment struct {
 
 	MATCHFINDER_LUASCRIPT    string `default:"_"`
 	MATCHFINDER_TIMEINTERVAL int    `default:"5000"`
+	MATCHFINDER_RESETSTATE   bool   `default:"false"`
 }
 
 var AppEnv AppEnvironment
@@ -64,6 +65,13 @@ func loadAppEnvironment() *AppEnvironment {
 				errors = append(errors, fmt.Errorf("env value(int): %s=%v: %v", fieldName, envValue, err))
 			} else {
 				field.SetInt(int64(intValue))
+			}
+		case reflect.Bool:
+			boolValue, err := strconv.ParseBool(envValue)
+			if err != nil {
+				errors = append(errors, fmt.Errorf("env value(bool): %s=%v: %v", fieldName, envValue, err))
+			} else {
+				field.SetBool(boolValue)
 			}
 		default:
 			errors = append(errors, fmt.Errorf("bad env type for app env %v", fieldName))

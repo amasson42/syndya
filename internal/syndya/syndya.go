@@ -9,7 +9,7 @@ func Run() {
 	app := App.MakeApp()
 	App.RouteApp(app)
 
-	app.StartMatchFinder()
+	app.MatchFinderService()
 
 	app.Router.Run(AppEnv.AppEnv.GetListener())
 
