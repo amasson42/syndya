@@ -13,6 +13,7 @@ kanban-plugin: basic
 
 ## Ongoing
 
+- [ ] Send game to players
 
 
 ## Pending

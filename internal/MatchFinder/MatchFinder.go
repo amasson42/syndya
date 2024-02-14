@@ -9,8 +9,10 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+// MatchupFunction defines a function signature for matching players.
 type MatchupFunction func(ids []int)
 
+// MatchFinder facilitates the asynchronous execution of Lua scripts for player matching.
 type MatchFinder struct {
 	playersBank       Models.SearchingPlayersBank
 	ignoreIncompletes bool
@@ -20,6 +22,7 @@ type MatchFinder struct {
 	MatchupDelegate   MatchupFunction
 }
 
+// NewMatchFinder creates a new MatchFinder instance.
 func NewMatchFinder(
 	playersBank Models.SearchingPlayersBank,
 	ignoreIncompletes bool,
@@ -42,6 +45,7 @@ func NewMatchFinder(
 	return mf, nil
 }
 
+// AsyncRunLoop asynchronously runs the match finder loop with the specified time interval.
 func (mf *MatchFinder) AsyncRunLoop(timeInterval int) {
 	go func() {
 		for {
@@ -55,6 +59,7 @@ func (mf *MatchFinder) AsyncRunLoop(timeInterval int) {
 	}()
 }
 
+// RunOnce executes a single iteration of the match finder loop.
 func (mf *MatchFinder) RunOnce() {
 	L := mf.luaState
 	if L == nil {
@@ -70,7 +75,6 @@ func (mf *MatchFinder) RunOnce() {
 	}
 
 	mf.playersBank.ForEach(func(player *Models.SearchingPlayer) {
-
 		playerUserData := L.NewUserData()
 		playerUserData.Value = player
 		L.Push(playerUserData)
@@ -82,7 +86,6 @@ func (mf *MatchFinder) RunOnce() {
 		}, playerUserData); err != nil {
 			log.Printf("[LUA]: %v\n", err)
 		}
-
 	}, mf.ignoreIncompletes)
 
 	if err := L.CallByParam(lua.P{
@@ -94,6 +97,7 @@ func (mf *MatchFinder) RunOnce() {
 	}
 }
 
+// reloadScript reloads the Lua script.
 func (mf *MatchFinder) reloadScript() error {
 	if mf.luaState != nil {
 		mf.luaState.Close()
