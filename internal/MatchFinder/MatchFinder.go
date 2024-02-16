@@ -3,6 +3,7 @@ package MatchFinder
 import (
 	"log"
 	"os"
+	"syndya/pkg/LuaExtension"
 	"syndya/pkg/Models"
 	"time"
 
@@ -54,6 +55,8 @@ func (mf *MatchFinder) AsyncRunLoop(timeInterval int) {
 			time.Sleep(time.Duration(timeInterval) * time.Millisecond)
 			mf.RunOnce()
 
+			mf.DeployMatchups()
+
 			if mf.resetEachLoop {
 				mf.reloadScript()
 			}
@@ -97,13 +100,14 @@ func (mf *MatchFinder) RunOnce() {
 	}); err != nil {
 		log.Printf("[LUA]: %v\n", err)
 	}
+}
 
+func (mf *MatchFinder) DeployMatchups() {
 	for i := 0; i < len(mf.pendingMatchups); i++ {
 		ids := mf.pendingMatchups[i]
 		mf.MatchupDelegate(ids)
 	}
 	mf.pendingMatchups = [][]int{}
-
 }
 
 // reloadScript reloads the Lua script.
@@ -115,24 +119,12 @@ func (mf *MatchFinder) reloadScript() error {
 
 	L := lua.NewState()
 
-	L.SetGlobal("__cast_go_player", L.NewFunction(func(L *lua.LState) int {
-		player := L.CheckUserData(1).Value.(*Models.SearchingPlayer)
+	LuaExtension.AddGetenvFunction(L)
+	LuaExtension.AddHttpRequestFunction(L)
+	LuaExtension.AddJsonFunction(L)
 
-		playerTable := L.NewTable()
-
-		playerTable.RawSetString("searchId", lua.LNumber(player.ID))
-		playerTable.RawSetString("waitTime", lua.LNumber(time.Now().Unix()-player.TimeStamp))
-
-		metaTable := L.NewTable()
-		for k, v := range player.MetaData {
-			metaTable.RawSetString(k, lua.LString(v))
-		}
-		playerTable.RawSetString("metaDatas", metaTable)
-
-		L.Push(playerTable)
-
-		return 1
-	}))
+	addCastGoPlayerFunction(L)
+	mf.addMatchupFunction(L)
 
 	scriptContent, err := os.ReadFile(mf.scriptPath)
 	if err != nil {
@@ -152,6 +144,32 @@ func (mf *MatchFinder) reloadScript() error {
 		return err
 	}
 
+	mf.luaState = L
+	return nil
+}
+
+func addCastGoPlayerFunction(L *lua.LState) {
+	L.SetGlobal("__cast_go_player", L.NewFunction(func(L *lua.LState) int {
+		player := L.CheckUserData(1).Value.(*Models.SearchingPlayer)
+
+		playerTable := L.NewTable()
+
+		playerTable.RawSetString("searchId", lua.LNumber(player.ID))
+		playerTable.RawSetString("waitTime", lua.LNumber(time.Now().Unix()-player.TimeStamp))
+
+		metaTable := L.NewTable()
+		for k, v := range player.MetaData {
+			metaTable.RawSetString(k, lua.LString(v))
+		}
+		playerTable.RawSetString("metaDatas", metaTable)
+
+		L.Push(playerTable)
+
+		return 1
+	}))
+}
+
+func (mf *MatchFinder) addMatchupFunction(L *lua.LState) {
 	L.SetGlobal("matchup", L.NewFunction(func(L *lua.LState) int {
 		nArgs := L.GetTop()
 		if nArgs != 1 {
@@ -174,7 +192,4 @@ func (mf *MatchFinder) reloadScript() error {
 		}
 		return 0
 	}))
-
-	mf.luaState = L
-	return nil
 }

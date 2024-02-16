@@ -14,6 +14,7 @@ kanban-plugin: basic
 
 ## Ongoing
 
+- [ ] Use external lua script to start a game
 
 
 ## Pending

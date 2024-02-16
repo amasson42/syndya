@@ -23,13 +23,13 @@ This document outlines the endpoints and functionalities provided by the API.
 
 # Environment Variables
 
-`LISTEN_HOST` (String) Http server listen host
-`LISTEN_PORT` (Integer) Http server listen port
-
-`METADATAS_LIST` (String) Comma separated list of requested metadata for the algorithm to function
-`METADATAS_REQUIRED` (Bool) Option to ignore players with missing metadatas when processing matchmakings
-`METADATAS_REVIVEPERIOD` (Integer) Time in milliseconds between each request from the server to fetch missing metadatas
-
-`MATCHFINDER_LUASCRIPT` (String) Path to the lua script file that manage matchmaking (details at [[Matchmaking script]]). If none is given, this service won't run.
-`MATCHFINDER_TIMEINTERVAL` (Integer) Time in milliseconds between each call to the custom script with all searching players
-`MATCHFINDER_RESETSTATE` (Bool) Fully destroy and re create the lua state between each matchmaking loops
+| Name | Type | Description |
+| ---- | ---- | ---- |
+| `LISTEN_HOST` | string | Http server listen host |
+| `LISTEN_PORT` | integer | Http server listen port |
+| `METADATAS_LIST` | string | Comma separated list of requested metadata for the algorithm to function |
+| `METADATAS_REQUIRED` | bool | Option to ignore players with missing metadatas when processing matchmakings |
+| `METADATAS_REVIVEPERIOD` | integer | Time in milliseconds between each request from the server to fetch missing metadatas |
+| `MATCHFINDER_LUASCRIPT` | string | Path to the lua script file that manage matchmaking (details at [[Matchmaking script]]). If none is given, this service won't run. |
+| `MATCHFINDER_TIMEINTERVAL` | integer | Time in milliseconds between each call to the custom script with all searching players |
+| `MATCHFINDER_RESETSTATE` | bool | Fully destroy and re create the Lua state between each matchmaking loops |
