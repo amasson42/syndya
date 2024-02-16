@@ -104,12 +104,10 @@ func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 
 // Safely iterate throught all searching players and execute the closure
 func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer), ignoreIncompletes bool) {
-	pb.contentMutex.Lock()
-	defer pb.contentMutex.Unlock()
-
-	for _, v := range pb.players {
-		if (v.Complete || !ignoreIncompletes) && v.GameAddr == nil {
-			f(&v)
+	players := pb.GetAllSearchingPlayers()
+	for _, p := range players {
+		if (p.Complete || !ignoreIncompletes) && p.GameAddr == nil {
+			f(&p)
 		}
 	}
 }
