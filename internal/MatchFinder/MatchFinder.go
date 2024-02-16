@@ -3,6 +3,7 @@ package MatchFinder
 import (
 	"log"
 	"os"
+	"syndya/internal/LuaExtensionSyndya"
 	"syndya/pkg/LuaExtension"
 	"syndya/pkg/Models"
 	"time"
@@ -123,7 +124,7 @@ func (mf *MatchFinder) reloadScript() error {
 	LuaExtension.AddHttpRequestFunction(L)
 	LuaExtension.AddJsonFunction(L)
 
-	addCastGoPlayerFunction(L)
+	LuaExtensionSyndya.AddCastGoPlayerFunction(L)
 	mf.addMatchupFunction(L)
 
 	scriptContent, err := os.ReadFile(mf.scriptPath)
@@ -146,27 +147,6 @@ func (mf *MatchFinder) reloadScript() error {
 
 	mf.luaState = L
 	return nil
-}
-
-func addCastGoPlayerFunction(L *lua.LState) {
-	L.SetGlobal("__cast_go_player", L.NewFunction(func(L *lua.LState) int {
-		player := L.CheckUserData(1).Value.(*Models.SearchingPlayer)
-
-		playerTable := L.NewTable()
-
-		playerTable.RawSetString("searchId", lua.LNumber(player.ID))
-		playerTable.RawSetString("waitTime", lua.LNumber(time.Now().Unix()-player.TimeStamp))
-
-		metaTable := L.NewTable()
-		for k, v := range player.MetaData {
-			metaTable.RawSetString(k, lua.LString(v))
-		}
-		playerTable.RawSetString("metaDatas", metaTable)
-
-		L.Push(playerTable)
-
-		return 1
-	}))
 }
 
 func (mf *MatchFinder) addMatchupFunction(L *lua.LState) {

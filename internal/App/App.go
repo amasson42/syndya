@@ -3,6 +3,7 @@ package App
 import (
 	"log"
 	"syndya/internal/AppEnv"
+	"syndya/internal/GameDeployer"
 	"syndya/internal/MatchFinder"
 	"syndya/pkg/Models"
 
@@ -10,9 +11,10 @@ import (
 )
 
 type App struct {
-	Router      *gin.Engine
-	PlayersBank Models.SearchingPlayersBank
-	MatchFinder *MatchFinder.MatchFinder
+	Router       *gin.Engine
+	PlayersBank  Models.SearchingPlayersBank
+	MatchFinder  *MatchFinder.MatchFinder
+	GameDeployer *GameDeployer.GameDeployer
 }
 
 func MakeApp() *App {
@@ -26,6 +28,7 @@ func MakeApp() *App {
 
 func (app *App) MatchFinderService() {
 	if !AppEnv.AppEnv.HasMatchFinderScript() {
+		log.Println("No script defined in MATCHFINDER_LUASCRIPT... Matchmaking service will not run")
 		return
 	}
 	matchfinder, err := MatchFinder.NewMatchFinder(
@@ -41,12 +44,40 @@ func (app *App) MatchFinderService() {
 
 	app.MatchFinder = matchfinder
 
-	matchfinder.MatchupDelegate = func(ids []int) {
-		// TODO: start a game and make players join
-		for i := 0; i < len(ids); i++ {
-			app.PlayersBank.SetSearchingPlayerGameAddr(ids[i], "unimplemented-game-deployement")
-		}
-	}
+	matchfinder.MatchupDelegate = app.startGameWithPlayers
 
 	matchfinder.AsyncRunLoop(AppEnv.AppEnv.MATCHFINDER_TIMEINTERVAL)
+}
+
+func (app *App) startGameWithPlayers(ids []int) {
+	if app.GameDeployer != nil {
+		players := app.PlayersBank.GetSearchingPlayerFromIDs(ids)
+		go func() {
+			for _, id := range ids {
+				app.PlayersBank.SetSearchingPlayerIsJoiningGame(id, true)
+			}
+			gameaddr, err := app.GameDeployer.DeployGame(players)
+			if err != nil {
+				log.Printf("Error deploying a game: %v", err)
+				return
+			}
+			for _, id := range ids {
+				app.PlayersBank.SetSearchingPlayerGameAddr(id, *gameaddr)
+				app.PlayersBank.SetSearchingPlayerIsJoiningGame(id, false)
+			}
+		}()
+	}
+}
+
+func (app *App) GameDeployerService() {
+	if !AppEnv.AppEnv.HasGameDeployerScript() {
+		log.Println("No script defined in GAMEDEPLOYER_LUASCRIPT... Game deloyement will not run")
+		return
+	}
+
+	gamedeployer := GameDeployer.NewGameDeployer(
+		AppEnv.AppEnv.GAMEDEPLOYER_LUASCRIPT,
+	)
+
+	app.GameDeployer = gamedeployer
 }

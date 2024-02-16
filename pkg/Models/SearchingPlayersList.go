@@ -57,6 +57,24 @@ func (pb *SearchingPlayersList) GetSearchingPlayerFromID(id int) *SearchingPlaye
 	return nil
 }
 
+// GetSearchingPlayerFromIDs returns an array of searching players matching the ids.
+func (pb *SearchingPlayersList) GetSearchingPlayerFromIDs(ids []int) []*SearchingPlayer {
+	pb.contentMutex.Lock()
+	defer pb.contentMutex.Unlock()
+
+	players := []*SearchingPlayer{}
+
+	for _, id := range ids {
+		player, exists := pb.players[id]
+		if exists {
+			players = append(players, &player)
+		} else {
+			players = append(players, nil)
+		}
+	}
+	return players
+}
+
 // UpdateSearchingPlayerMetadata updates the metadata of a searching player.
 func (pb *SearchingPlayersList) UpdateSearchingPlayerMetadata(id int, key, value string) bool {
 	pb.contentMutex.Lock()
@@ -68,6 +86,7 @@ func (pb *SearchingPlayersList) UpdateSearchingPlayerMetadata(id int, key, value
 	return false
 }
 
+// SetSearchingPlayerComplete sets the Complete field of a searching player with the given ID.
 func (pb *SearchingPlayersList) SetSearchingPlayerComplete(id int, complete bool) bool {
 	pb.contentMutex.Lock()
 	defer pb.contentMutex.Unlock()
@@ -79,6 +98,19 @@ func (pb *SearchingPlayersList) SetSearchingPlayerComplete(id int, complete bool
 	return false
 }
 
+// SetSearchingPlayerIsJoiningGame sets the JoiningGame field of a searching player with the given ID.
+func (pb *SearchingPlayersList) SetSearchingPlayerIsJoiningGame(id int, joining bool) bool {
+	pb.contentMutex.Lock()
+	defer pb.contentMutex.Unlock()
+	if player, exists := pb.players[id]; exists {
+		player.JoiningGame = joining
+		pb.players[id] = player
+		return true
+	}
+	return false
+}
+
+// SetSearchingPlayerGameAddr sets the GameAddr field of a searching player with the given ID.
 func (pb *SearchingPlayersList) SetSearchingPlayerGameAddr(id int, addr string) bool {
 	pb.contentMutex.Lock()
 	defer pb.contentMutex.Unlock()
@@ -102,11 +134,11 @@ func (pb *SearchingPlayersList) DeleteSearchingPlayer(id int) bool {
 	return false
 }
 
-// Safely iterate throught all searching players and execute the closure
+// ForEach safely iterates through all searching players and executes the closure.
 func (pb *SearchingPlayersList) ForEach(f func(*SearchingPlayer), ignoreIncompletes bool) {
 	players := pb.GetAllSearchingPlayers()
 	for _, p := range players {
-		if (p.Complete || !ignoreIncompletes) && p.GameAddr == nil {
+		if (p.Complete || !ignoreIncompletes) && !p.JoiningGame && p.GameAddr == nil {
 			f(&p)
 		}
 	}

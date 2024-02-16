@@ -12,5 +12,7 @@ services:
             LISTEN_PORT: 8080
             GIN_MODE: debug
             METADATAS_LIST: rating
+            ENV MATCHFINDER_LUASCRIPT: assets/matchup.lua
+            ENV GAMEDEPLOYER_LUASCRIPT: assets/deploygame.lua
         ports:
             - 8080:8080

@@ -22,6 +22,8 @@ type AppEnvironment struct {
 	MATCHFINDER_LUASCRIPT    string `default:"_"`
 	MATCHFINDER_TIMEINTERVAL int    `default:"5000"`
 	MATCHFINDER_RESETSTATE   bool   `default:"false"`
+
+	GAMEDEPLOYER_LUASCRIPT string `default:"_"`
 }
 
 var AppEnv AppEnvironment
@@ -102,4 +104,8 @@ func (appEnv *AppEnvironment) GetMetadataList() []string {
 
 func (appEnv *AppEnvironment) HasMatchFinderScript() bool {
 	return appEnv.MATCHFINDER_LUASCRIPT != "_"
+}
+
+func (appEnv *AppEnvironment) HasGameDeployerScript() bool {
+	return appEnv.GAMEDEPLOYER_LUASCRIPT != "_"
 }

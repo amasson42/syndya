@@ -1,7 +1,6 @@
 # syndya
 
-MatchMaking microservice that starts multiplayer sessions for a given game 
-
+MatchMaking microservice that allows players to look for a game and make matching party
 
 ## How to use
 

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"syndya/internal/GameDeployer"
 	"syndya/internal/MatchFinder"
 	"syndya/pkg/Models"
 )
@@ -48,11 +49,30 @@ func testMatchfinder(filepath string) {
 
 	if err != nil {
 		fmt.Printf("Error: %v", err)
+		return
 	}
 
 	mf.RunOnce()
 }
 
 func testMatchdeployer(filepath string) {
+	players := Models.NewSearchingPlayersList()
 
+	for i := 0; i < 3; i++ {
+		id := players.CreateSearchingPlayer()
+		players.UpdateSearchingPlayerMetadata(id, "rating", fmt.Sprint(1000+2*i))
+		players.SetSearchingPlayerComplete(id, true)
+	}
+
+	gd := GameDeployer.NewGameDeployer(filepath)
+
+	ids := players.GetSearchingPlayerFromIDs([]int{1, 2, 3})
+
+	game, err := gd.DeployGame(ids)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		return
+	}
+
+	fmt.Printf("Gam=%v", *game)
 }

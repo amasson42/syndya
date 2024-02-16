@@ -11,6 +11,8 @@ func Run() {
 
 	app.MatchFinderService()
 
+	app.GameDeployerService()
+
 	app.Router.Run(AppEnv.AppEnv.GetListener())
 
 	TearDown(app)
