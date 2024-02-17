@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -23,12 +24,28 @@ func AddHttpRequestFunction(L *lua.LState) {
 	L.SetGlobal("httpRequest", L.NewFunction(func(L *lua.LState) int {
 		verb := L.ToString(1)
 		url := L.ToString(2)
+
 		req, err := http.NewRequest(verb, url, nil)
 		if err != nil {
 			L.Push(lua.LNil)
 			L.Push(lua.LString(fmt.Sprintf("Error creating HTTP request: %v", err)))
 			return 2
 		}
+
+		if L.GetTop() >= 3 {
+			headersTable := L.ToTable(3)
+			headers := make(http.Header)
+			headersTable.ForEach(func(key, value lua.LValue) {
+				headers.Add(lua.LVAsString(key), lua.LVAsString(value))
+			})
+			req.Header = headers
+		}
+
+		if L.GetTop() >= 4 {
+			bodyStr := L.ToString(4)
+			req.Body = io.NopCloser(strings.NewReader(bodyStr))
+		}
+
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			L.Push(lua.LNil)
