@@ -30,7 +30,7 @@ This document outlines the endpoints and functionalities provided by the API.
 | `METADATAS_LIST` | string | Comma separated list of requested metadata for the algorithm to function |
 | `METADATAS_REQUIRED` | bool | Option to ignore players with missing metadatas when processing matchmakings |
 | `METADATAS_REVIVEPERIOD` | integer | Time in milliseconds between each request from the server to fetch missing metadatas |
-| `MATCHFINDER_LUASCRIPT` | string | Path to the lua script file that manage matchmaking (details at [[Matchmaking script]]). If none is given, this service won't run. |
+| `MATCHFINDER_LUASCRIPT` | string | Path to the lua script file that manage matchmaking (details at [[LUA Scripts]]). If none is given, this service won't run. |
 | `MATCHFINDER_TIMEINTERVAL` | integer | Time in milliseconds between each call to the custom script with all searching players |
 | `MATCHFINDER_RESETSTATE` | bool | Fully destroy and re create the Lua state between each matchmaking loops |
-| `GAMEDEPLOYER_LUASCRIPT` | string | Path to the lua script file that manage game deployement (details at [[Game Deploying script]]). If none is given, this service won't run. |
+| `GAMEDEPLOYER_LUASCRIPT` | string | Path to the lua script file that manage game deployement (details at [[LUA Scripts]]). If none is given, this service won't run. |

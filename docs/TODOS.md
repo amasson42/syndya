@@ -11,6 +11,7 @@ kanban-plugin: basic
 - [ ] Only process players with full metadata
 - [ ] Send game to players
 - [ ] Use external lua script to start a game
+- [ ] Write documentation on how to write matchmaking script
 
 
 ## Ongoing
@@ -19,13 +20,18 @@ kanban-plugin: basic
 
 ## Pending
 
-- [ ] Communicate with a kubernetes cluster to start a new game
+- [ ] Remove gin dependency to use standard library
 - [ ] Gracefully close connection when player disconnect to join a game
-- [ ] Write documentation on how to write matchmaking script
+- [ ] Implement redis server usage
+- [ ] Communicate with a kubernetes cluster to start a new game
+
+
+## Doc
+
 - [ ] Documentation on game deployement script
 - [ ] Documentation on setting up this service
-- [ ] Implement redis server usage
 - [ ] Documentation on scaling up this service
+- [ ] Documentation on metadata
 
 
 
