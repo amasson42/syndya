@@ -16,7 +16,7 @@ type Params struct {
 func parseParams() *Params {
 
 	filepath := flag.String("file", "assets/matchup.lua", "path to the lua script")
-	mode := flag.String("mode", "matchfinder", "algorithm to test [ matchfinder | matchdeployer ]")
+	mode := flag.String("mode", "matchfinder", "algorithm to test [ matchfinder | gamedeployer ]")
 
 	flag.Parse()
 
@@ -33,8 +33,8 @@ func main() {
 	if params.mode == "matchfinder" {
 		testMatchfinder(params.filepath)
 	}
-	if params.mode == "matchdeployer" {
-		testMatchdeployer(params.filepath)
+	if params.mode == "gamedeployer" {
+		testGamedeployer(params.filepath)
 	}
 
 }
@@ -55,7 +55,7 @@ func testMatchfinder(filepath string) {
 	mf.RunOnce()
 }
 
-func testMatchdeployer(filepath string) {
+func testGamedeployer(filepath string) {
 	players := Models.NewSearchingPlayersList()
 
 	for i := 0; i < 3; i++ {
@@ -74,5 +74,5 @@ func testMatchdeployer(filepath string) {
 		return
 	}
 
-	fmt.Printf("Gam=%v", *game)
+	fmt.Printf("Game=%v", *game)
 }

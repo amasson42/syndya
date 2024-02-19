@@ -65,6 +65,10 @@ function finish()
 end
 ```
 
+Test your script
+```sh
+go run cmd/testlua/main.go -file my_script.lua -mode matchfinder
+```
 ## Game deployer script
 
 The Game Deployer script manages the deployment of games within the service.
@@ -73,7 +77,23 @@ The Game Deployer script manages the deployment of games within the service.
 
 - **Environment Variable**: `GAMEDEPLOYER_LUASCRIPT`
 
+### Execution Steps
 
+When a match is found, a new thread will start and will execute the script. It's therefore non-blocking for the service.
+
+The function `deploy(players)` will get executed. The parameter is a list of players defined with the same structure as the matchfinder script.
+
+A string is expected as the return value by the service to get broadcast to the players. It should be a usable link to join the game by the player like an ip address.
+### Script Example
+
+
+Test your script
+```sh
+go run cmd/testlua/main.go -file my_script.lua -mode gamedeployer
+```
+### Extended Extended possibilities
+
+If you don't have what you need to deploy your game
 
 # Extended lua functions
 
@@ -85,4 +105,4 @@ These functions leverage compiled Go features for improved performance.
 | ---- | ---- | ---- | ---- |
 | `getenv(string)` | `string` | Fetches the value of an environment variable. | `user = getenv("USER")` |
 | `httpRequest(string, string, table, string)` | `string` | Makes an HTTP request and returns the body of the response. | `response = httpRequest("POST", "https://example.com/api", {["Content-Type"] = "application/json"}, '{"key": "value"}')` |
-| `json(string)` | `table` | Parses a string into a JSON object. | `jsonObject = json('{"name": "John", "age": 30, "city": "New York"}')`<br> |
+| `json(string)` | `table` | Parses a string into a JSON object. | `jsonObject = json('{"name": "John", "age": 30, "city": "New York"}')` |

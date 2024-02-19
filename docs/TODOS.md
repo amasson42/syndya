@@ -16,6 +16,7 @@ kanban-plugin: basic
 
 ## Ongoing
 
+- [ ] Documentation on game deployement script
 
 
 ## Pending
@@ -28,7 +29,6 @@ kanban-plugin: basic
 
 ## Doc
 
-- [ ] Documentation on game deployement script
 - [ ] Documentation on setting up this service
 - [ ] Documentation on scaling up this service
 - [ ] Documentation on metadata
