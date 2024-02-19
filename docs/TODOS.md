@@ -25,6 +25,7 @@ kanban-plugin: basic
 - [ ] Gracefully close connection when player disconnect to join a game
 - [ ] Implement redis server usage
 - [ ] Communicate with a kubernetes cluster to start a new game
+- [ ] use gRPC instead of clocking database read to trigger player game found notification
 
 
 ## Doc
